@@ -10,7 +10,10 @@ WORKDIR /tmp
 RUN git clone --branch 0.19.1 https://github.com/elm/compiler.git .
 RUN rm worker/elm.cabal
 RUN cabal new-update
-RUN cabal new-build --disable-executable-dynamic --ghc-option=-optl=-static --enable-executable-stripping
+RUN cabal new-build
 
-FROM scratch
-COPY --from=builder /tmp/dist-newstyle/build/x86_64-linux/ghc-8.4.3/elm-0.19.1/x/elm/build/elm/elm /
+FROM node:lts-alpine3.10
+COPY --from=builder /tmp/dist-newstyle/build/x86_64-linux/ghc-8.4.3/elm-0.19.1/x/elm/build/elm/elm /usr/lib/bin
+USER node
+WORKDIR ~
+ENTRYPOINT ["ash"]

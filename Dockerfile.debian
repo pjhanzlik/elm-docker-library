@@ -1,0 +1,19 @@
+FROM debian:buster AS builder
+
+ENV LANG C.UTF-8
+
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN apt-get -y install git haskell-platform
+
+WORKDIR /tmp
+RUN git clone --branch 0.19.1 https://github.com/elm/compiler.git .
+RUN rm worker/elm.cabal
+RUN cabal new-update
+RUN cabal new-build
+
+FROM node:lts-buster
+COPY --from=builder /tmp/dist-newstyle/build/x86_64-linux/ghc-8.4.4/elm-0.19.1/x/elm/build/elm/elm /usr/lib/bin
+USER node
+WORKDIR ~
+ENTRYPOINT ["bash"]
