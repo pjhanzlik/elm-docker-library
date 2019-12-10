@@ -1,0 +1,20 @@
+# ARG from-tag
+# ARG elm-tag
+# ARG from-image?
+
+FROM alpine:3
+
+ENV LANG C.UTF-8
+
+RUN apk add --update cabal ghc git musl-dev ncurses-static zlib-dev wget
+
+RUN git clone https://github.com/elm/compiler.git
+WORKDIR compiler
+RUN git checkout tags/0.19.1
+
+RUN cabal v2-update
+RUN cabal v2-build --disable-executable-dynamic --ghc-option=-optl=-static --enable-executable-stripping
+
+FROM scratch
+COPY --from=builder /tmp/elm/dist-newstyle/build/x86_64-linux/ghc-8.4.3/elm-0.19.1/x/elm/build/elm /
+ENTRYPOINT ["/elm"]
