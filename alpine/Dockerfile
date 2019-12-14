@@ -1,4 +1,4 @@
-FROM alpine:3.10 AS builder
+FROM alpine:latest AS builder
 
 RUN apk add --update cabal ghc git musl-dev ncurses-dev ncurses-static wget zlib-dev
 
