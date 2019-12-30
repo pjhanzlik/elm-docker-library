@@ -1,15 +1,17 @@
-FROM alpine:latest AS builder
+FROM alpine:3 AS builder
 
-RUN apk add --update cabal ghc git musl-dev ncurses-dev ncurses-static wget zlib-dev
+RUN apk add --update cabal ghc musl-dev ncurses-dev ncurses-static wget zlib-dev zlib-static
 
-WORKDIR /usr/local/src
-RUN git clone https://github.com/elm/compiler.git elm
-WORKDIR /usr/local/src/elm
+WORKDIR /tmp
+
+RUN apk add git
+ARG branch
+RUN git clone -b ${branch} --bare https://github.com/elm/compiler.git
 RUN rm worker/elm.cabal
+
 RUN cabal new-update
-# --ghc-option=-optl=-static can be replaced by --enable-executable-static for Cabal ^3.0.0
-RUN cabal new-build --enable-split-sections --enable-executable-stripping --enable-library-stripping --disable-executable-dynamic --disable-shared --ghc-option=-optl=-static
+RUN cabal new-build --ghc-option=-optl=-static --enable-split-sections --enable-executable-stripping
 
 FROM scratch
-COPY --from=builder /usr/local/src/elm/dist-newstyle/build/*-linux/ghc-*/elm-*/x/elm/build/elm/elm /
-ENTRYPOINT ["/elm"]
+COPY --from=builder /tmp/elm/dist-newstyle/build/*-linux/ghc-*/elm-*/x/elm/build/elm/elm /
+CMD ["/elm"]
