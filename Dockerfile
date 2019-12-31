@@ -6,7 +6,7 @@ WORKDIR /tmp
 
 RUN apk add git
 ARG branch=master
-RUN git clone -b ${branch} --bare https://github.com/elm/compiler.git
+RUN git clone -b ${branch} https://github.com/elm/compiler.git .
 RUN rm worker/elm.cabal
 
 RUN cabal new-update
