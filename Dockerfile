@@ -13,5 +13,5 @@ RUN cabal new-update
 RUN cabal new-build --ghc-option=-optl=-static --enable-split-sections --enable-executable-stripping
 
 FROM scratch
-COPY --from=builder /tmp/elm/dist-newstyle/build/*-linux/ghc-*/elm-*/x/elm/build/elm/elm /
+COPY --from=builder /tmp/dist-newstyle/build/*-linux/ghc-*/elm-*/x/elm/build/elm/elm /
 CMD ["/elm"]
